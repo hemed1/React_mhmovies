@@ -6,14 +6,12 @@ import './styles.css';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import * as FirebaseHanle from './components/firebase.js';
 import * as Globals from './globals.js';
-//import { ColourOption, colourOptions } from '../data';
-// https://react-select.com/home
-import './components/menusComponent.css';
+import './components/menusComponent.css';      // https://react-select.com/home
 import * as GridHandle from './components/GridWidget.js'
 import Select, { /* StylesConfig */ } from 'react-select';
 import { Plus, Trash2/* , X, ChevronRight, Users, Subtitles, CheckLine, Check, CheckIcon, CheckLineIcon, EllipsisVertical */ } from "lucide-react";
 
-import soundFile from './audio/squonk_cut.mp3';
+//import soundFile from './audio/squonk_cut.mp3';
 
 
 
@@ -43,7 +41,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 {
   const [selectedItem, setSelectedItem] = useState(null);
   const [data, setData] = useState(dbData);
-  //const [dataOriginal, setDataOriginal] = useState(dbData);
   const [dataBaseIndex] = useState(dbIndex);
   const [isShowGrid, setIsShowGrid] = useState(false);
   const [gridData, setGridData] = useState(null);
@@ -51,7 +48,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
   const [isMenuOpen1, setIsMenuOpen1] = useState(false);
   const [selectedDatabaseIndex, setSelectedDatabaseIndex] = useState(null);
 
-  //dbData = dataOriginal;
 
   dataMovies = data['dataMovies'];
   dataBaseTable = data['dataBaseTable'];
@@ -109,34 +105,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 
   //Globals.PlayAudio('./audio/squonk_cut.mp3');
  
-
-  const handleFadeOut = (audioPlayer) => 
-  {
-    const audio = audioPlayer;    //audioRef.current;
-    const intervalTime = 50; 
-    const volumeStep = 0.05; 
-
-    //alert('FADE');
-    
-    const fadeInterval = setInterval(() => 
-    {
-      if (audio.volume > volumeStep) {
-        // Explicitly format decimal to prevent binary floating-point bugs
-        audio.volume = parseFloat((audio.volume - volumeStep).toFixed(2));
-      } 
-      else 
-      {
-        clearInterval(fadeInterval);
-        audio.volume = 0;
-        audio.pause();
-        console.log("Audio fully faded out and paused.");
-      }
-    }, intervalTime);
-
-    return () => fadeInterval;
-
-  };
-
   
   function toggleMenu1() 
   {
@@ -175,7 +143,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
       const newList = {...data, dataMovies: dataMovies }
       setData(newList);
       dbData = newList;
-      //setDataOriginal(newList);
   }
 
   function handleSaveLookup(tableName, newData)
@@ -214,7 +181,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
     
     setData(newList);
     dbData = newList;
-    //setDataOriginal(newList);
 
     setSelectedItem(null);
     handleSelectItem(selectedItem);
@@ -245,7 +211,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
     const newList = {...data, dataMovies: dataMovies }
     setData(newList);
     dbData = newList;
-    //setDataOriginal(newList);
 
     if (records.length>0)
     {
@@ -355,7 +320,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
                                         </ul>
                                     </li>
                                     
-                                    <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>צמצום מזההי פתקים</a></li>
+                                    <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>צמצום מזההי סרטים</a></li>
                                     {/* <li><a key={23} href="#database" onClick={(e) => showDataGridDatabase()}>טבלת מסד-נתונים</a></li> */}
                                 </ul>
                             </li>
@@ -364,7 +329,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
                             <li>
                                 <a href='#development' className="has-children">ניהול נתונים</a>
                                 <ul className="submenu">
-                                    <li><a key={21} href='#note' onClick={(e) => showDataGridNotes()} className='has-children'>טבלת פתקים</a></li>
+                                    <li><a key={21} href='#note' onClick={(e) => showDataGridNotes()} className='has-children'>טבלת סרטים</a></li>
                                     <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>טבלת בנים</a></li>
                                     {/* <li><a key={23} href="#database" onClick={(e) => showDataGridDatabase()}>טבלת מסד-נתונים</a></li> */}
                                     {/* <li><a key={23} href="#database-main" onClick={(e) => showDataGridMainDatabase()}>טבלת מסד-נתונים מרכזי</a></li> */}
@@ -695,65 +660,65 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
     //   { value: '#987654', label: 'black' }
     // ]
 
-    const colourStyles = {
-      control: (styles) => ({ ...styles, backgroundColor: 'rgb(254, 254, 255)', height: '26px', width: '500px', color: 'blue', fontSize: '20px', textAlign: 'right', direction: 'rtl' }),
-      option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-        //const color = '#c1b1d1';    // '#263375'
-        return {
-          ...styles, /* backgroundColor: 'red', */ fontSize: '21px', height: '30px',
+    // const colourStyles = {
+    //   control: (styles) => ({ ...styles, backgroundColor: 'rgb(254, 254, 255)', height: '26px', width: '500px', color: 'blue', fontSize: '20px', textAlign: 'right', direction: 'rtl' }),
+    //   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+    //     //const color = '#c1b1d1';    // '#263375'
+    //     return {
+    //       ...styles, /* backgroundColor: 'red', */ fontSize: '21px', height: '30px',
          
-          /// BackColor of List
-          // backgroundColor: isDisabled
-          //                     ? undefined
-          //                     : isSelected
-          //                       ? data.color
-          //                       : isFocused
-          //                         ? color    // Items in list backColor on Active
-          //                         : undefined,
-       /*    color: isDisabled                 // Items in list ForeColor 
-                    ? '#ccc'
-                    : isSelected
-                      ? isFocused        //chroma.contrast(color, 'white') > 2
-                        ? '#ccc'
-                        : 'black'
-                    : data.color,    // Items in  /*list ForColor*/
+    //       /// BackColor of List
+    //       // backgroundColor: isDisabled
+    //       //                     ? undefined
+    //       //                     : isSelected
+    //       //                       ? data.color
+    //       //                       : isFocused
+    //       //                         ? color    // Items in list backColor on Active
+    //       //                         : undefined,
+    //    /*    color: isDisabled                 // Items in list ForeColor 
+    //                 ? '#ccc'
+    //                 : isSelected
+    //                   ? isFocused        //chroma.contrast(color, 'white') > 2
+    //                     ? '#ccc'
+    //                     : 'black'
+    //                 : data.color,    // Items in  /*list ForColor*/
                     
-          cursor: isDisabled ? 'not-allowed' : 'default',
+    //       cursor: isDisabled ? 'not-allowed' : 'default',
           
-          // Mouse Down colors
-          ':active': {
-            ...styles[':active'],
-                  color: '#fff',                         /// Mouse Down ForeColor      
-                  backgroundColor: !isDisabled
-                                      ? isSelected
-                                        ? '#fff'
-                                        : '#3958b778'   /// Mouse Down BackColor
-                                      : undefined,
-          },
-        };
-      },
-      multiValue: (styles, { data }) => {
-        const color = 'rgb(224, 222, 214)';
-        return {
-          ...styles,
-          backgroundColor: color,
-          color: 'blue'
-          /* width: '100px' */
-        };
-      },
-      multiValueLabel: (styles, { data }) => ({
-        ...styles,
-        color: '#f56996',   /// Selected items in row ForeColor
-      }),
-      multiValueRemove: (styles, { data }) => ({
-        ...styles,
-        color: '#9888',
-        ':hover': {
-          backgroundColor: '#3c6c31',
-          color: 'white',
-        },
-      }),
-    };
+    //       // Mouse Down colors
+    //       ':active': {
+    //         ...styles[':active'],
+    //               color: '#fff',                         /// Mouse Down ForeColor      
+    //               backgroundColor: !isDisabled
+    //                                   ? isSelected
+    //                                     ? '#fff'
+    //                                     : '#3958b778'   /// Mouse Down BackColor
+    //                                   : undefined,
+    //       },
+    //     };
+    //   },
+    //   multiValue: (styles, { data }) => {
+    //     const color = 'rgb(224, 222, 214)';
+    //     return {
+    //       ...styles,
+    //       backgroundColor: color,
+    //       color: 'blue'
+    //       /* width: '100px' */
+    //     };
+    //   },
+    //   multiValueLabel: (styles, { data }) => ({
+    //     ...styles,
+    //     color: '#f56996',   /// Selected items in row ForeColor
+    //   }),
+    //   multiValueRemove: (styles, { data }) => ({
+    //     ...styles,
+    //     color: '#9888',
+    //     ':hover': {
+    //       backgroundColor: '#3c6c31',
+    //       color: 'white',
+    //     },
+    //   }),
+    // };
 
    
     if (f_update_mode)
@@ -1220,6 +1185,7 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
                 <Globals.FieldInScreen  captionText="ג׳נר"  fieldID="txt_statusID" width={100} control={
                   <Select 
                     name="genres"
+                    className="input, select, textarea"
                     value={genresArray}
                     options={dataGenres} 
                     defaultValue={genresArray}
