@@ -42,22 +42,21 @@ await Init();
 
 export async function Init() 
 {
+  // Get URL parameters like ?=dbIndex = 1
   const queryParameters = new URLSearchParams(window.location.search)
   const dbIndex = queryParameters.get("dbIndex")
-  //const name = queryParameters.get("name")
-
-  // יצירת אובייקט לקריאת הפרמטרים מה-URL
-  //const [searchParams] = useSearchParams();
-  // שליפת הערך של הפרמטר 'user'
-  //const dbIndex = searchParams.get('dbIndex');
-
-
-  const tmpDataBaseIndex = await getDatabaseIndexFromFile("launch.json");
-  //console.log('Firebase Init - getDatabaseIndexFromFile: ',tmpDataBaseIndex);
 
   if (dbIndex)
   {
     dataBaseIndex = Number(dbIndex);
+  }
+  else
+  {
+    const tmpDataBaseIndex = await getDatabaseIndexFromFile("launch.json");
+    if (tmpDataBaseIndex)
+    {
+      dataBaseIndex = tmpDataBaseIndex;
+    }
   }
 
   database = await changeDatabase(dataBaseIndex);
@@ -642,17 +641,22 @@ export async function dispose()
 /// Fetch the JSON file directly using standard JavaScript fetch
 async function getDatabaseIndexFromFile( fileName ) 
 {
+  var result = null;
   const response = await fetch("/" + fileName);
 
   if (!response.ok) 
   {
-    throw new Error(`Failed to load launch.json: ${response.statusText}`);
+    return null;
+    //throw new Error(`Failed to load launch.json: ${response.statusText}`);
   }
 
   const obj = await response.json();
-  const dbIndex = Number(obj.DatabaselistIndex); 
-  
-  return dbIndex;
+  if (obj['DatabaselistIndex'] != null)
+  {
+    result = Number(obj.DatabaselistIndex); 
+  }
+
+  return result;
 }
 
 /// Change Databse
