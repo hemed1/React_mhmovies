@@ -26,6 +26,8 @@ var dataFilmTypes = [];
 var dataGenres = [];
 var dataMusicians = [];
 var dataWriters = [];
+var dataEditors = [];
+
 
 /// Fields controller vars
 var f_update_mode = true;
@@ -57,6 +59,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
   dataGenres = data['dataGenres'];
   dataMusicians = data['dataMusicians'];
   dataWriters = data['dataWriters'];
+  dataEditors = data['dataEditors'];
   dataChilds = data['dataChilds'];
 
   f_dataBaseIndex = dataBaseIndex;
@@ -96,7 +99,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
         // videoPlayer.play();
         loader.remove();
         //Globals.PlayAudio('clips/Video 1-Opening.mp4'); 
-      }, 7000); // Matches the 0.5s CSS transition duration
+      }, 8000); // Matches the 0.5s CSS transition duration
       
       
       return () => clearTimeout(timeout);
@@ -175,6 +178,10 @@ export default function App({dbData, dbIndex} )      /* initialData */
         dataWriters = sortedList;
         newList = {...data, dataWriters: dataWriters }
         break;
+      case 'TBL_Editors':
+        dataEditors = sortedList;
+        newList = {...data, dataEditors: dataEditors }
+        break;
       default:
         return;
     }
@@ -246,10 +253,16 @@ export default function App({dbData, dbIndex} )      /* initialData */
     setSelectedCode(21)
 
     const arrayColumns = [
-                        {caption: 'מזהה', fieldName: 'MovieID', type: 'number', width: '100px', color: '#303033'}, 
+                        {caption: 'מזהה', fieldName: 'MovieID', type: 'number', width: '80px', color: '#303033'}, 
                         {caption: 'מזהה רשומה', fieldName: 'FirebaseID', type: 'string', width: '280px', color: '#303033'},
                         {caption: 'כותרת', fieldName: 'Title', type: 'string', width: '280px', color: '#303033'},
                         {caption: 'תיאור', fieldName: 'Description', type: 'string', width: '400px', color: '#303033'},
+                        {caption: 'ג׳נר', fieldName: 'Genre', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'שחקנים', fieldName: 'Actors', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'במאים', fieldName: 'Director', type: 'string', width: '400px', color: '#303033'},
+                        {caption: 'כותבים', fieldName: 'Writer', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'עורכים', fieldName: 'Editor', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'מוזיקאים', fieldName: 'Music', type: 'string', width: '300px', color: '#303033'},
                        ]
 
     GridHandle.GridReset();
@@ -257,7 +270,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
 
     setGridData(
       <GridHandle.GridWidget  data={dataMovies} title='ניהול נתונים' tableName='TBL_Movies' arrayColumns={arrayColumns} 
-                              top='120px' left='150px' width='1120px' height='900px' onSaveFuncName={onGridSaveFuncName} />
+                              top='120px' left='150px' width='1120px' height='2500px' onSaveFuncName={onGridSaveFuncName} />
     );
   }
 
@@ -398,8 +411,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 //   dataMovies = /* await */ GetTableData("TBL_Movies");
 
 //   dataBaseTable = /* await */ GetTableData("TBL_Databases");
-
-//   //dataListTypes = /* await */ mapToLookupObject('TBL_ListTypes');
 //   dataActores = /* await */ mapToLookupObject('TBL_Actors');
 //   dataDirector = /* await */ mapToLookupObject('TBL_Directors');
 //   dataEditors = /* await */ mapToLookupObject('TBL_Editors');
@@ -605,13 +616,14 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
     const [music, setMusic] = useState('');
     const [country, setCountry] = useState('');
     const [language, setLanguage] = useState('');
+    const [lastUpdate] = useState(selectedItem?.LastUpdateDate);
     
     const [actoresArray, setActoresArray] = useState([]);
     const [directorArray, setDirectorArray] = useState([]);
     const [writersArray, setWritersArray] = useState([]);
     const [genresArray, setGenresArray] = useState([]);
     const [musiciansArray, setMusiciansArray] = useState([]);
-    const [lastUpdate] = useState(selectedItem?.LastUpdateDate);
+    const [editorsArray, setAEditorsArray] = useState([]);
 
     /// General stateas
     //const [isSearchable, setIsSearchable] = useState(true);
@@ -728,6 +740,7 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setActoresArray(null);
       setDirectorArray(null);
       setWritersArray(null);
+      setAEditorsArray(null);
       setMusiciansArray(null);
 
       setTitle(selectedItem?.Title);
@@ -739,6 +752,7 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setLanguage(selectedItem?.Language);
       setSelfLink(selectedItem?.SelfLink);
       setEditor(selectedItem?.Editor);
+      
 
       var arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Genre, dataGenres);
       setGenresArray(arrayItems);
@@ -759,6 +773,11 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setWritersArray(arrayItems);
       result = Globals.lookupObjectToSeperatedString(arrayItems);
       setWriter(result);
+
+      arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Editor, dataEditors);
+      setAEditorsArray(arrayItems);
+      result = Globals.lookupObjectToSeperatedString(arrayItems);
+      setEditor(result);
       
       arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Music, dataMusicians);
       setMusiciansArray(arrayItems);
@@ -845,6 +864,15 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
           /// Transfer from combo objects to seperated string
           const result = Globals.lookupObjectToSeperatedString(e);
           setMusic(result);
+          break;
+        }
+
+        case 6:
+        {
+          setAEditorsArray(e);
+          /// Transfer from combo objects to seperated string
+          const result = Globals.lookupObjectToSeperatedString(e);
+          setEditor(result);
           break;
         }
 
@@ -1274,6 +1302,29 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
                     />}
                 />
                 <button type='button'  style={{width: '11px', height: '10px', alignSelf: 'AlignLeft'}} onClick={(e) => handleAddLookupItem('כותבים', 'TBL_Writers', dataWriters)}>+</button>
+              </div>
+
+              <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'right'}}>      
+                <Globals.FieldInScreen  captionText="עורכים"  fieldID="txt_statusID" width={100} control={
+                    <Select 
+                      name="editors"
+                      value={editorsArray}
+                      options={dataEditors} 
+                      defaultValue={editorsArray}
+                      isMulti 
+                      closeMenuOnSelect={false} 
+                      //styles={colourStyles}
+                      onChange={(e) => handleChange(e, 6)}
+                      // className="basic-single"
+                      // classNamePrefix="select"
+                      // isDisabled={isDisabled}
+                      // isLoading={isLoading}
+                      isClearable={true}
+                      isRtl={true}
+                      //isSearchable={isSearchable}
+                    />}
+                />
+                <button type='button'  style={{width: '11px', height: '10px', alignSelf: 'AlignLeft'}} onClick={(e) => handleAddLookupItem('עורכים', 'TBL_Editors', dataEditors)}>+</button>
               </div>
 
               <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'right'}}>   
