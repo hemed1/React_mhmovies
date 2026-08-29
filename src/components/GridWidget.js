@@ -227,18 +227,14 @@ export function GridWidget( {data, title, tableName, arrayColumns,
       if (!foundItem) 
       {
          itemsToSave.push(newEdit);
-         //setItemsToSave(itemsToSave);
       }
       else
       {
          const index = itemsToSave.findIndex((edit) => edit.id === newEdit.id && edit.row === selectedRowIndex);
-         //const [ foundItem, ...tmpItems ] = itemsToSave;
          itemsToSave.splice(index, 1);
-         //setItemsToSave(itemsToSave);
-         //itemsToSave = tmpItems;
-         //const res = [...itemsToSave].filter(item => !(item.id === res.id && edit.row === selectedRowIndex));
-         //itemsToSave = res;
       }
+
+      setSortDirection(sortDirection);
   }
 
   function getRowColor(item, itemsToSave, rowIndex, defaultColor) 
@@ -283,11 +279,9 @@ export function GridWidget( {data, title, tableName, arrayColumns,
 
   return (
 
-    <form className="page-container" style={{marginRight:'30px', top: top, /* left: left, */ width: width, height: height, backgroundColor: backgroundColor}}>
+    <form className="page-container" style={{marginRight:'30px', marginLeft:'30px', top: top, /* left: left, */ /* width: width, */ height: height, backgroundColor: backgroundColor}}>
       
       <h2 style={{textAlign: 'center', color: 'white'}}>{title}</h2>
-      
-      {/* <hr/> */}
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '15px', paddingLeft: '10px', paddingRight: '10px'}}>
          <button type="button" onClick={handleSaveChanges} style={{display: 'flex', padding: '5px 10px', backgroundColor: 'red' ,  color: 'white', border: 'none', borderRadius: '4px'}} title="שמירת שינויים" >
@@ -307,87 +301,99 @@ export function GridWidget( {data, title, tableName, arrayColumns,
       </div>
      
 
-      {/* // Search */}
-      <div style={{display: 'flex', flexDirection: 'row', gap: '15px'}}>
-         {searchArray.map((col, colIndex) =>
-            <input type="text"
-                  style={{backgroundColor: 'rgba(164, 201, 237, 0.5)', width: String(Number(arrayColumns[colIndex].width.substring(0, arrayColumns[colIndex].width.length - 2))-10)+'px', boxSizing: 'border-box'}}
-                  value={String(col['value'])}
-                  onChange={(e) => handleSearch(colIndex, e.target.value)}
-               />
-         )}
-      </div>
+      <div className="grid-container" >
 
-
-      <table >
-
-         {/* // Headers Caption */}
-         <tr style={{backgroundColor: 'lightblue', color: 'black', direction: 'rtl', display: 'flex', flexDirection: 'row', 
-                     borderBottom: '2px solid #212020', alignItems: 'center', paddingLeft: '0px', paddingRight: '4px', borderRadius: '5px'}}>
-               {arrayColumns.map((col , index) => (
-                  <th key={index} className='gridCol' style={{width: col.width}} onClick={() => handleSort(col.fieldName)}>{col.caption}</th>
-               ))}
-         </tr>
-      
-         <div className="grid-container" style={{maxHeight: String(Number(height.substring(0, height.length - 2)) - 225)+'px'}}>
-         {
-            sortedProducts
-                  .filter((item) => 
-                        {
-                           var found = true;
-                           for (var i=0; i<searchArray.length; i++)
-                           {
-                              const obj = searchArray[i]; 
-                              const value = String(obj.value).trim();
-                              found = (( value !== '')  
-                                       ? (String(item[arrayColumns[i].fieldName]).indexOf(value)>-1)
-                                       : true)
-                              if (!found)
-                              {
-                                 break;
-                              }
-                              // searchArray.map((e, colIndex) => (
-                              //          (String(e.value).trim() !== '')  
-                              //          ? (String(item[arrayColumns[colIndex].fieldName]).indexOf(String(e.value).trim())>-1)
-                              //          : true
-                              //   )
-                              //)
-                           }
-                           return found;
-                        }
-                     )
-                  .map((item, rowIndex) => (
-                     <tr   key={rowIndex} className={`row-item ${ selectedRowIndex === rowIndex ? "selected" : ""}`}  
-                           style={{color: getRowColor(item, itemsToSave, rowIndex, 'black')}}
-                           onClick={() => setSelectedRowIndex(rowIndex)}>
-                     {
-                        arrayColumns.map((col, colIndex) => (
-                        
-                           <td key={colIndex} className='gridCol' title={item[col.fieldName]} 
-                                          style={{color: getRowColor(item, itemsToSave, rowIndex, col.color)}}
-                                          width={col.width}> 
-                              {
-                                 !isEditMode
-                                    ? (String(item[col.fieldName]).length > 40)
-                                          ? String(item[col.fieldName]).substring(0, 30) + '...'
-                                          : String(item[col.fieldName])
-                                    : 
-                                    <input 
-                                       type={(col.type==='number') ? "number": "text"}
-                                       style={{width: String(Number(col.width.substring(0, col.width.length - 2))-25)+'px'/* , boxSizing: 'border-box' */}}
-                                       value={String(item[col.fieldName])}
-                                       onChange={(e) => updateCell(rowIndex, colIndex, item.id, e.target.value)}
-                                    />
-                              }
-                        </td>
-                  ))
-                     }
-                     </tr>
-                  ))
-         }
+         {/* // Search */}
+         <div style={{display: 'flex', flexDirection: 'row', gap: '0px'}}>
+            {searchArray.map((col, colIndex) =>
+               <input type="text"  /* className='gridCol' */
+                     style={{display: 'flex',  /* , flexDirection: 'row' , gap: '0px', */
+                              backgroundColor: 'rgba(164, 201, 237, 0.5)', 
+                              minWidth: arrayColumns[colIndex].width,      //String(Number(arrayColumns[colIndex].width.substring(0, arrayColumns[colIndex].width.length - 2))-10)+'px',  
+                              paddingLeft: '7px', 
+                              paddingRight: '7px', 
+                              marginBottom: '7px',
+                              marginLeft: '3px',
+                              boxSizing: 'border-box' }}    /* , minWidth: '3000px'   */
+                     value={String(col['value'])}
+                     onChange={(e) => handleSearch(colIndex, e.target.value)}/>
+            )}
          </div>
 
-      </table>
+         <table  style={{tableLayout: 'fixed', /* width: '100%', */ borderCollapse: 'collapse' /* , maxWidth: '2000px', maxHeight: '720px' */}}>   
+            
+            <thead>
+               {/* // Headers Caption */}
+               <tr className='grid-headers'>
+                     {arrayColumns.map((col , index) => 
+                     (
+                        <th key={index} className='gridCol' style={{width: col.width, position: 'sticky', top: '0',  zIndex: '2'/* , backgroundColor: 'lightblue' */}} onClick={() => handleSort(col.fieldName)}>{col.caption}</th>
+                     ))}
+               </tr>  
+            </thead>  
+
+            <tbody>
+            {
+               sortedProducts
+                     .filter((item) => 
+                           {
+                              var found = true;
+                              for (var i=0; i<searchArray.length; i++)
+                              {
+                                 const obj = searchArray[i]; 
+                                 const value = String(obj.value).trim();
+                                 found = (( value !== '')  
+                                          ? (String(item[arrayColumns[i].fieldName]).indexOf(value)>-1)
+                                          : true)
+                                 if (!found)
+                                 {
+                                    break;
+                                 }
+                                 // searchArray.map((e, colIndex) => (
+                                 //          (String(e.value).trim() !== '')  
+                                 //          ? (String(item[arrayColumns[colIndex].fieldName]).indexOf(String(e.value).trim())>-1)
+                                 //          : true
+                                 //   )
+                                 //)
+                              }
+                              return found;
+                           }
+                        )
+                     .map((item, rowIndex) => (
+                        <tr key={rowIndex} className={`row-item ${ selectedRowIndex === rowIndex ? "selected" : ""}`}  
+                           style={{color: getRowColor(item, itemsToSave, rowIndex, 'black')}}
+                           onClick={() => setSelectedRowIndex(rowIndex)}>
+                        {
+                           arrayColumns.map((col, colIndex) => (
+                           
+                              <td key={colIndex} className='gridCol' title={item[col.fieldName]} style={{width: col.width, color: getRowColor(item, itemsToSave, rowIndex, col.color)}}> 
+                                 {
+                                    !isEditMode
+                                       ? (String(item[col.fieldName]).length > 40)
+                                             ? String(item[col.fieldName]).substring(0, 30) + '...'
+                                             : String(item[col.fieldName])
+                                       : 
+                                       <input 
+                                          type={(col.type==='number') ? "number": "text"}
+                                          style={{width: String(Number(col.width.substring(0, col.width.length - 2))-25)+'px'/* , boxSizing: 'border-box' */}}
+                                          value={String(item[col.fieldName])}
+                                          onChange={(e) => updateCell(rowIndex, colIndex, item.id, e.target.value)}
+                                       />
+                                 }
+                              </td>
+                           ))
+                        }
+                        </tr>
+                     ))
+            }
+
+            </tbody>
+
+         </table> 
+
+         
+      </div>
+
 
     </form>
 
