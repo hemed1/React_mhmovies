@@ -6,14 +6,12 @@ import './styles.css';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import * as FirebaseHanle from './components/firebase.js';
 import * as Globals from './globals.js';
-//import { ColourOption, colourOptions } from '../data';
-// https://react-select.com/home
-import './components/menusComponent.css';
+import './components/menusComponent.css';      // https://react-select.com/home
 import * as GridHandle from './components/GridWidget.js'
 import Select, { /* StylesConfig */ } from 'react-select';
 import { Plus, Trash2/* , X, ChevronRight, Users, Subtitles, CheckLine, Check, CheckIcon, CheckLineIcon, EllipsisVertical */ } from "lucide-react";
 
-import soundFile from './audio/squonk_cut.mp3';
+//import soundFile from './audio/squonk_cut.mp3';
 
 
 
@@ -28,6 +26,8 @@ var dataFilmTypes = [];
 var dataGenres = [];
 var dataMusicians = [];
 var dataWriters = [];
+var dataEditors = [];
+
 
 /// Fields controller vars
 var f_update_mode = true;
@@ -43,7 +43,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 {
   const [selectedItem, setSelectedItem] = useState(null);
   const [data, setData] = useState(dbData);
-  //const [dataOriginal, setDataOriginal] = useState(dbData);
   const [dataBaseIndex] = useState(dbIndex);
   const [isShowGrid, setIsShowGrid] = useState(false);
   const [gridData, setGridData] = useState(null);
@@ -51,7 +50,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
   const [isMenuOpen1, setIsMenuOpen1] = useState(false);
   const [selectedDatabaseIndex, setSelectedDatabaseIndex] = useState(null);
 
-  //dbData = dataOriginal;
 
   dataMovies = data['dataMovies'];
   dataBaseTable = data['dataBaseTable'];
@@ -61,6 +59,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
   dataGenres = data['dataGenres'];
   dataMusicians = data['dataMusicians'];
   dataWriters = data['dataWriters'];
+  dataEditors = data['dataEditors'];
   dataChilds = data['dataChilds'];
 
   f_dataBaseIndex = dataBaseIndex;
@@ -100,7 +99,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
         // videoPlayer.play();
         loader.remove();
         //Globals.PlayAudio('clips/Video 1-Opening.mp4'); 
-      }, 7000); // Matches the 0.5s CSS transition duration
+      }, 5000); // Matches the 0.5s CSS transition duration
       
       
       return () => clearTimeout(timeout);
@@ -109,34 +108,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 
   //Globals.PlayAudio('./audio/squonk_cut.mp3');
  
-
-  const handleFadeOut = (audioPlayer) => 
-  {
-    const audio = audioPlayer;    //audioRef.current;
-    const intervalTime = 50; 
-    const volumeStep = 0.05; 
-
-    //alert('FADE');
-    
-    const fadeInterval = setInterval(() => 
-    {
-      if (audio.volume > volumeStep) {
-        // Explicitly format decimal to prevent binary floating-point bugs
-        audio.volume = parseFloat((audio.volume - volumeStep).toFixed(2));
-      } 
-      else 
-      {
-        clearInterval(fadeInterval);
-        audio.volume = 0;
-        audio.pause();
-        console.log("Audio fully faded out and paused.");
-      }
-    }, intervalTime);
-
-    return () => fadeInterval;
-
-  };
-
   
   function toggleMenu1() 
   {
@@ -175,7 +146,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
       const newList = {...data, dataMovies: dataMovies }
       setData(newList);
       dbData = newList;
-      //setDataOriginal(newList);
   }
 
   function handleSaveLookup(tableName, newData)
@@ -208,13 +178,16 @@ export default function App({dbData, dbIndex} )      /* initialData */
         dataWriters = sortedList;
         newList = {...data, dataWriters: dataWriters }
         break;
+      case 'TBL_Editors':
+        dataEditors = sortedList;
+        newList = {...data, dataEditors: dataEditors }
+        break;
       default:
         return;
     }
     
     setData(newList);
     dbData = newList;
-    //setDataOriginal(newList);
 
     setSelectedItem(null);
     handleSelectItem(selectedItem);
@@ -245,7 +218,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
     const newList = {...data, dataMovies: dataMovies }
     setData(newList);
     dbData = newList;
-    //setDataOriginal(newList);
 
     if (records.length>0)
     {
@@ -281,10 +253,16 @@ export default function App({dbData, dbIndex} )      /* initialData */
     setSelectedCode(21)
 
     const arrayColumns = [
-                        {caption: 'מזהה', fieldName: 'MovieID', type: 'number', width: '100px', color: '#303033'}, 
-                        {caption: 'מזהה רשומה', fieldName: 'FirebaseID', type: 'string', width: '280px', color: '#303033'},
+                        {caption: 'מזהה', fieldName: 'MovieID', type: 'number', width: '80px', color: '#303033'}, 
                         {caption: 'כותרת', fieldName: 'Title', type: 'string', width: '280px', color: '#303033'},
                         {caption: 'תיאור', fieldName: 'Description', type: 'string', width: '400px', color: '#303033'},
+                        {caption: 'ג׳נר', fieldName: 'Genre', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'שחקנים', fieldName: 'Actors', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'במאים', fieldName: 'Director', type: 'string', width: '400px', color: '#303033'},
+                        {caption: 'כותבים', fieldName: 'Writer', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'עורכים', fieldName: 'Editor', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'מוזיקאים', fieldName: 'Music', type: 'string', width: '300px', color: '#303033'},
+                        {caption: 'מזהה רשומה', fieldName: 'FirebaseID', type: 'string', width: '280px', color: '#303033'},
                        ]
 
     GridHandle.GridReset();
@@ -292,7 +270,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
 
     setGridData(
       <GridHandle.GridWidget  data={dataMovies} title='ניהול נתונים' tableName='TBL_Movies' arrayColumns={arrayColumns} 
-                              top='120px' left='150px' width='1120px' height='900px' onSaveFuncName={onGridSaveFuncName} />
+                              top='190px' left='150px' width='2080px' height='900px' onSaveFuncName={onGridSaveFuncName} />
     );
   }
 
@@ -324,73 +302,73 @@ export default function App({dbData, dbIndex} )      /* initialData */
       
       <nav className="navbar">
         
-                <ul className="nav-menu">
-                    
-                    <li key='1' className='nav-item'>
-                        <a key='1' className={(selectedCode === 1) ? "active" : ""} href="#home" onClick={(e) => setIsShowGrid(false)}>Home</a>
-                    </li>
-                    
-                    
-                    {/* <!-- First Dropdown Parent --> */}
-                    <li key='2'className="nav-item">
-                        <a key={2} href="#services" className={`has-children ${(selectedCode === 2) ? "active" : ""}`} onClick={(e) => setSelectedCode(2)}>שרותים</a>
-                    
-                        {/* <!-- Level 1 Dropdown --> */}
+        <ul className="nav-menu">
+            
+            <li key='1' className='nav-item'>
+                <a key='1' className={(selectedCode === 1) ? "active" : ""} href="#home" onClick={(e) => setIsShowGrid(false)}>Home</a>
+            </li>
+            
+            
+            {/* <!-- First Dropdown Parent --> */}
+            <li key='2'className="nav-item">
+                <a key={2} href="#services" className={`has-children ${(selectedCode === 2) ? "active" : ""}`} onClick={(e) => setSelectedCode(2)}>שרותים</a>
+            
+                {/* <!-- Level 1 Dropdown --> */}
+                <ul className="submenu">
+                    <li>
+                        <a href="#web-design" className="has-children" onClick={(e) => toggleMenu1()}>מסד-נתונים</a>
+                        {/* <!-- Level 2 Dropdown (Submenu) --> */}
                         <ul className="submenu">
                             <li>
-                                <a href="#web-design" className="has-children" onClick={(e) => toggleMenu1()}>מסד-נתונים</a>
-                                {/* <!-- Level 2 Dropdown (Submenu) --> */}
-                                <ul className="submenu">
-                                    <li>
-                                      <a key={21} href='#note'  className='has-children'>החלפת מסד</a>
-                                        <ul className="submenu" value={selectedDatabaseIndex}  style={{listStyleType: 'none', direction: 'ltr', textAlign: 'left', backgroundColor: '#edcb8b'}}  onChange={(e) => handleSelectDatabase(Number(e.target.value))} >
-                                        {
-                                            FirebaseHanle.DataBasesConfigList.map((item, index) =>
-                                            (
-                                                <li key={index} style={{width: '200px'}} onClick={(e) => handleSelectDatabase(index)}>
-                                                  <a href={`#${index}`} > {`${index+1} - ${item.projectId}`} </a> 
-                                                </li>
-                                            ))
-                                        }
-                                        </ul>
-                                    </li>
-                                    
-                                    <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>צמצום מזההי פתקים</a></li>
-                                    {/* <li><a key={23} href="#database" onClick={(e) => showDataGridDatabase()}>טבלת מסד-נתונים</a></li> */}
-                                </ul>
-                            </li>
-                                
-                            {/* <!-- Nested Submenu Parent --> */}
-                            <li>
-                                <a href='#development' className="has-children">ניהול נתונים</a>
-                                <ul className="submenu">
-                                    <li><a key={21} href='#note' onClick={(e) => showDataGridNotes()} className='has-children'>טבלת פתקים</a></li>
-                                    <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>טבלת בנים</a></li>
-                                    {/* <li><a key={23} href="#database" onClick={(e) => showDataGridDatabase()}>טבלת מסד-נתונים</a></li> */}
-                                    {/* <li><a key={23} href="#database-main" onClick={(e) => showDataGridMainDatabase()}>טבלת מסד-נתונים מרכזי</a></li> */}
+                              <a key={21} href='#note'  className='has-children'>החלפת מסד</a>
+                                <ul className="submenu" value={selectedDatabaseIndex}  style={{listStyleType: 'none', direction: 'ltr', textAlign: 'left', backgroundColor: '#edcb8b'}}  onChange={(e) => handleSelectDatabase(Number(e.target.value))} >
+                                {
+                                    FirebaseHanle.DataBasesConfigList.map((item, index) =>
+                                    (
+                                        <li key={index} style={{width: '200px'}} onClick={(e) => handleSelectDatabase(index)}>
+                                          <a href={`#${index}`} > {`${index+1} - ${item.projectId}`} </a> 
+                                        </li>
+                                    ))
+                                }
                                 </ul>
                             </li>
                             
-                            <li><a href="#marketing">שוק</a></li>
+                            <li><a key={22} href="#child" onClick={(e) => FirebaseHanle.changeIDs('TBL_Movies')}>צמצום מזהי פתקים</a></li>
+                            <li><a key={23} href="#database2" /* onClick={(e) => showDataGridDatabase()} */>פנויי</a></li>
                         </ul>
                     </li>
-        
-                 
-                    <li key='3' className="nav-item">
-                        <a key='3' className={(selectedCode === 3) ? "active" : ""} onClick={(e) => setSelectedCode(3)} href="#contact">Contact</a>
-                    </li>
-        
-        
-                    {/* <!-- Second Dropdown Parent --> */}
-                    <li key='4' className="nav-item">
-                        <a key='4' className={"has-children" + (selectedCode === 4 ? " active" : "")} href="#about"  onClick={(e) => setSelectedCode(4)}>About</a>
+                        
+                    {/* <!-- Nested Submenu Parent --> */}
+                    <li>
+                        <a href='#development' className="has-children">ניהול נתונים</a>
                         <ul className="submenu">
-                            <li><button>Our Team</button></li>
-                            <li><button>Company History</button></li>
+                            <li><a key={21} href='#note' onClick={(e) => showDataGridNotes()} className='has-children'>טבלת סרטים</a></li>
+                            <li><a key={22} href="#child" onClick={(e) => showDataGridChilds()}>טבלת בנים</a></li>
+                            {/* <li><a key={23} href="#database" onClick={(e) => showDataGridDatabase()}>טבלת מסד-נתונים</a></li> */}
+                            {/* <li><a key={23} href="#database-main" onClick={(e) => showDataGridMainDatabase()}>טבלת מסד-נתונים מרכזי</a></li> */}
                         </ul>
-                    </li>   
-        
+                    </li>
+                    
+                    <li><a href="#marketing">שוק</a></li>
                 </ul>
+            </li>
+
+          
+            <li key='3' className="nav-item">
+                <a key='3' className={(selectedCode === 3) ? "active" : ""} onClick={(e) => setSelectedCode(3)} href="#contact">Contact</a>
+            </li>
+
+
+            {/* <!-- Second Dropdown Parent --> */}
+            <li key='4' className="nav-item">
+                <a key='4' className={"has-children" + (selectedCode === 4 ? " active" : "")} href="#about"  onClick={(e) => setSelectedCode(4)}>About</a>
+                <ul className="submenu">
+                    <li><button>Our Team</button></li>
+                    <li><button>Company History</button></li>
+                </ul>
+            </li>   
+
+        </ul>
                 
       </nav>
 
@@ -408,8 +386,7 @@ export default function App({dbData, dbIndex} )      /* initialData */
                 selectedItem={selectedItem} 
                 onSelectedItem={handleSelectItem}
                 onSaveSubTasks={handleSaveSubTasks}
-                onSaveLookup={handleSaveLookup}
-                /* onDeleteSubTask={handleDeleteSubTask} */ />
+                onSaveLookup={handleSaveLookup} />
           }
         </div>
       }
@@ -433,8 +410,6 @@ export default function App({dbData, dbIndex} )      /* initialData */
 //   dataMovies = /* await */ GetTableData("TBL_Movies");
 
 //   dataBaseTable = /* await */ GetTableData("TBL_Databases");
-
-//   //dataListTypes = /* await */ mapToLookupObject('TBL_ListTypes');
 //   dataActores = /* await */ mapToLookupObject('TBL_Actors');
 //   dataDirector = /* await */ mapToLookupObject('TBL_Directors');
 //   dataEditors = /* await */ mapToLookupObject('TBL_Editors');
@@ -624,8 +599,8 @@ function ListDataItem({index, selectedIndex, itemObject, selectedItem, onSelecte
 
 function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup }) 
 {
-
     /// Controls values states
+    const [movieID, setMovieID] = useState(selectedItem?.NoteID || '');
     const [title, setTitle] = useState(selectedItem?.Title || '');
     const [desc, setDesc] = useState(selectedItem?.Description || '');
     const [filmTypeID, setFilmTypeID] = useState(selectedItem?.ListTypeID || 3);
@@ -640,13 +615,14 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
     const [music, setMusic] = useState('');
     const [country, setCountry] = useState('');
     const [language, setLanguage] = useState('');
+    const [lastUpdate] = useState(selectedItem?.LastUpdateDate);
     
     const [actoresArray, setActoresArray] = useState([]);
     const [directorArray, setDirectorArray] = useState([]);
     const [writersArray, setWritersArray] = useState([]);
     const [genresArray, setGenresArray] = useState([]);
     const [musiciansArray, setMusiciansArray] = useState([]);
-    const [lastUpdate] = useState(selectedItem?.LastUpdateDate);
+    const [editorsArray, setAEditorsArray] = useState([]);
 
     /// General stateas
     //const [isSearchable, setIsSearchable] = useState(true);
@@ -695,65 +671,65 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
     //   { value: '#987654', label: 'black' }
     // ]
 
-    const colourStyles = {
-      control: (styles) => ({ ...styles, backgroundColor: 'rgb(254, 254, 255)', height: '26px', width: '500px', color: 'blue', fontSize: '20px', textAlign: 'right', direction: 'rtl' }),
-      option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-        //const color = '#c1b1d1';    // '#263375'
-        return {
-          ...styles, /* backgroundColor: 'red', */ fontSize: '21px', height: '30px',
+    // const colourStyles = {
+    //   control: (styles) => ({ ...styles, backgroundColor: 'rgb(254, 254, 255)', height: '26px', width: '500px', color: 'blue', fontSize: '20px', textAlign: 'right', direction: 'rtl' }),
+    //   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+    //     //const color = '#c1b1d1';    // '#263375'
+    //     return {
+    //       ...styles, /* backgroundColor: 'red', */ fontSize: '21px', height: '30px',
          
-          /// BackColor of List
-          // backgroundColor: isDisabled
-          //                     ? undefined
-          //                     : isSelected
-          //                       ? data.color
-          //                       : isFocused
-          //                         ? color    // Items in list backColor on Active
-          //                         : undefined,
-       /*    color: isDisabled                 // Items in list ForeColor 
-                    ? '#ccc'
-                    : isSelected
-                      ? isFocused        //chroma.contrast(color, 'white') > 2
-                        ? '#ccc'
-                        : 'black'
-                    : data.color,    // Items in  /*list ForColor*/
+    //       /// BackColor of List
+    //       // backgroundColor: isDisabled
+    //       //                     ? undefined
+    //       //                     : isSelected
+    //       //                       ? data.color
+    //       //                       : isFocused
+    //       //                         ? color    // Items in list backColor on Active
+    //       //                         : undefined,
+    //    /*    color: isDisabled                 // Items in list ForeColor 
+    //                 ? '#ccc'
+    //                 : isSelected
+    //                   ? isFocused        //chroma.contrast(color, 'white') > 2
+    //                     ? '#ccc'
+    //                     : 'black'
+    //                 : data.color,    // Items in  /*list ForColor*/
                     
-          cursor: isDisabled ? 'not-allowed' : 'default',
+    //       cursor: isDisabled ? 'not-allowed' : 'default',
           
-          // Mouse Down colors
-          ':active': {
-            ...styles[':active'],
-                  color: '#fff',                         /// Mouse Down ForeColor      
-                  backgroundColor: !isDisabled
-                                      ? isSelected
-                                        ? '#fff'
-                                        : '#3958b778'   /// Mouse Down BackColor
-                                      : undefined,
-          },
-        };
-      },
-      multiValue: (styles, { data }) => {
-        const color = 'rgb(224, 222, 214)';
-        return {
-          ...styles,
-          backgroundColor: color,
-          color: 'blue'
-          /* width: '100px' */
-        };
-      },
-      multiValueLabel: (styles, { data }) => ({
-        ...styles,
-        color: '#f56996',   /// Selected items in row ForeColor
-      }),
-      multiValueRemove: (styles, { data }) => ({
-        ...styles,
-        color: '#9888',
-        ':hover': {
-          backgroundColor: '#3c6c31',
-          color: 'white',
-        },
-      }),
-    };
+    //       // Mouse Down colors
+    //       ':active': {
+    //         ...styles[':active'],
+    //               color: '#fff',                         /// Mouse Down ForeColor      
+    //               backgroundColor: !isDisabled
+    //                                   ? isSelected
+    //                                     ? '#fff'
+    //                                     : '#3958b778'   /// Mouse Down BackColor
+    //                                   : undefined,
+    //       },
+    //     };
+    //   },
+    //   multiValue: (styles, { data }) => {
+    //     const color = 'rgb(224, 222, 214)';
+    //     return {
+    //       ...styles,
+    //       backgroundColor: color,
+    //       color: 'blue'
+    //       /* width: '100px' */
+    //     };
+    //   },
+    //   multiValueLabel: (styles, { data }) => ({
+    //     ...styles,
+    //     color: '#f56996',   /// Selected items in row ForeColor
+    //   }),
+    //   multiValueRemove: (styles, { data }) => ({
+    //     ...styles,
+    //     color: '#9888',
+    //     ':hover': {
+    //       backgroundColor: '#3c6c31',
+    //       color: 'white',
+    //     },
+    //   }),
+    // };
 
    
     if (f_update_mode)
@@ -763,8 +739,10 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setActoresArray(null);
       setDirectorArray(null);
       setWritersArray(null);
+      setAEditorsArray(null);
       setMusiciansArray(null);
 
+      setMovieID(selectedItem?.MovieID);
       setTitle(selectedItem?.Title);
       setDesc(selectedItem?.Description);
       setFilmTypeID(selectedItem?.FilmTypeID);
@@ -774,6 +752,7 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setLanguage(selectedItem?.Language);
       setSelfLink(selectedItem?.SelfLink);
       setEditor(selectedItem?.Editor);
+      
 
       var arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Genre, dataGenres);
       setGenresArray(arrayItems);
@@ -794,6 +773,11 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
       setWritersArray(arrayItems);
       result = Globals.lookupObjectToSeperatedString(arrayItems);
       setWriter(result);
+
+      arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Editor, dataEditors);
+      setAEditorsArray(arrayItems);
+      result = Globals.lookupObjectToSeperatedString(arrayItems);
+      setEditor(result);
       
       arrayItems = Globals.seperatedStringToLookupObject(selectedItem.Music, dataMusicians);
       setMusiciansArray(arrayItems);
@@ -880,6 +864,15 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
           /// Transfer from combo objects to seperated string
           const result = Globals.lookupObjectToSeperatedString(e);
           setMusic(result);
+          break;
+        }
+
+        case 6:
+        {
+          setAEditorsArray(e);
+          /// Transfer from combo objects to seperated string
+          const result = Globals.lookupObjectToSeperatedString(e);
+          setEditor(result);
           break;
         }
 
@@ -1200,9 +1193,12 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
 
             <div className='div_items_fields2'>
 
-              <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'space-evenly'}}>
-                <button type='button' style={{backgroundColor: 'rgb(45, 31, 172)', color: 'white', height: '30px'}} onClick={(e) => handleShowSubTasksScreen()}>תת-משימות</button>
-                <button type='button' style={{backgroundColor: 'rgb(45, 31, 172)', color: 'white', height: '30px'}} onClick={(e) => handleAddSubLine()}>תמונות</button>
+              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'space-evenly', width: '80%'}}>
+                  <button type='button' style={{backgroundColor: 'rgb(45, 31, 172)', color: 'white', height: '30px'}} onClick={(e) => handleShowSubTasksScreen()}>תת-משימות</button>
+                  <button type='button' style={{backgroundColor: 'rgb(45, 31, 172)', color: 'white', height: '30px'}} onClick={(e) => handleAddSubLine()}>תמונות</button>
+                </div>
+                <label style={{fontSize: '19px', alignSelf: 'end'}}>מזהה: {movieID}</label>
               </div>
 
               <div style={{display: 'flex', flexDirection: 'row', rowGap: '6px', justifyContent: 'space-between'}}>
@@ -1220,6 +1216,7 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
                 <Globals.FieldInScreen  captionText="ג׳נר"  fieldID="txt_statusID" width={100} control={
                   <Select 
                     name="genres"
+                    className="input, select, textarea"
                     value={genresArray}
                     options={dataGenres} 
                     defaultValue={genresArray}
@@ -1308,6 +1305,29 @@ function NoteScreen({ selectedItem, onSelectedItem, onSaveSubTasks, onSaveLookup
                     />}
                 />
                 <button type='button'  style={{width: '11px', height: '10px', alignSelf: 'AlignLeft'}} onClick={(e) => handleAddLookupItem('כותבים', 'TBL_Writers', dataWriters)}>+</button>
+              </div>
+
+              <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'right'}}>      
+                <Globals.FieldInScreen  captionText="עורכים"  fieldID="txt_statusID" width={100} control={
+                    <Select 
+                      name="editors"
+                      value={editorsArray}
+                      options={dataEditors} 
+                      defaultValue={editorsArray}
+                      isMulti 
+                      closeMenuOnSelect={false} 
+                      //styles={colourStyles}
+                      onChange={(e) => handleChange(e, 6)}
+                      // className="basic-single"
+                      // classNamePrefix="select"
+                      // isDisabled={isDisabled}
+                      // isLoading={isLoading}
+                      isClearable={true}
+                      isRtl={true}
+                      //isSearchable={isSearchable}
+                    />}
+                />
+                <button type='button'  style={{width: '11px', height: '10px', alignSelf: 'AlignLeft'}} onClick={(e) => handleAddLookupItem('עורכים', 'TBL_Editors', dataEditors)}>+</button>
               </div>
 
               <div style={{display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'right'}}>   
