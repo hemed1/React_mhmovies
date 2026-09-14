@@ -40,7 +40,7 @@ async function InitApp()
     
     dbData = {'dataMovies': dataMovies, 'dataBaseTable': dataBaseTable, 'dataChilds': dataChilds, 
               'dataActores': dataActores, 'dataDirector': dataDirector, 'dataFilmTypes': dataFilmTypes, 'dataGenres': dataGenres, 
-              'dataMusicians': dataMusicians, 'dataWriters': dataWriters, 'dataListTypes': dataListTypes};
+              'dataMusicians': dataMusicians, 'dataWriters': dataWriters, 'dataEditors': dataEditors};
 
     //handleData();
 
@@ -105,6 +105,7 @@ async function getData()
   dataGenres = await  mapToLookupObject('TBL_Genres');
   dataMusicians = await  mapToLookupObject('TBL_Musicians');
   dataWriters = await  mapToLookupObject('TBL_Writers');
+  dataEditors = await  mapToLookupObject('TBL_Editors');
   
  
   dataChilds = await FirebaseHanle.GetTableDataSync("TBL_NotesChilds");

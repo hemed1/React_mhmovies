@@ -573,12 +573,12 @@ export function FadePlayer(soundFile)
   // Use a ref to keep track of a single persistent Audio instance
   const audioRef = useRef(new Audio(soundFile));
 
-  const handlePlay = () => {
-    const audio = audioRef.current;
-    // Reset volume back to 1 (max) in case it was previously faded out
-    audio.volume = 1; 
-    audio.play().catch(err => console.log("Autoplay blocked:", err));
-  };
+  // const handlePlay = () => {
+  //   const audio = audioRef.current;
+  //   // Reset volume back to 1 (max) in case it was previously faded out
+  //   audio.volume = 1; 
+  //   audio.play().catch(err => console.log("Autoplay blocked:", err));
+  // };
 
   const handleFadeOut = () => {
     const audio = audioRef.current;
@@ -631,15 +631,3 @@ export function PlayAudio(filePath)
   //return ( html );
 }
 
-// Import the file directly if it is stored in the src/assets/ folder
-// import mySong from './assets/audio-file.mp3'; 
-
-// function AudioPlayer() {
-//   return (
-//     <div>
-//       <h3>Standard Audio Player</h3>
-//       {/* The controls attribute adds play/pause buttons automatically */}
-//       <audio src={mySong} controls />
-//     </div>
-//   );
-// }
