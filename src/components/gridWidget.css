@@ -27,12 +27,13 @@ body {
   border-radius: 10px;
   gap: 12px;
   /* background-color: #e6e4e4; */
-  padding: 15px;
-  /* top: 200px;
-  left: 100px;
-  width: 1200px;
-  height: 500px; */
-  /* max-height: 1000px; */
+  padding: 20px;
+  /* top: 200px; */
+  /* left: 100px; */
+  width: 100%;
+  /* height: 500px; */
+  /* max-width: 2080px; */
+  max-height: 950px;
   margin: 0 auto;
   font-family: sans-serif;
 }
@@ -43,10 +44,14 @@ body {
   flex-direction: column;
   column-gap: 20px;               /* No Efect - Space between columns */
   row-gap: 0px;                   /* Space between Rows */
-  /* overflow: auto; */                /* Scrollbar for vertical overflow */
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   scrollbar-width: auto;          /* For Firefox */
+  /* max-width: 2040px; */
+  max-height: 850px;
+  /* padding-right: 0px;
+  padding-left: 0px; */
+  /* width: 2050px; */
   /* max-height: 500px; */               /* Limit the height of the grid */
   /* gap: 30px; */
   /* align-items: stretch; */
@@ -57,24 +62,65 @@ body {
   /* המרווח (Gap) בין הפריטים ברשת */
 }
 
+.grid-headers{
+  background-color: lightblue;
+  color: black;
+  direction: rtl; 
+  display: flex; 
+  flex-direction: row; 
+  text-align: center;
+  /* gap: 5px; */
+  /* min-width: 100px; */
+  padding-left: 7px; 
+  padding-right: 7px; 
+  border-bottom: 3px solid #212020;
+  border-radius: 5px;
+  cursor: pointer;
+  /* max-width: 2000px; */
+}
+
+.gridCol{
+  display: flex;
+  flex-direction: row;
+  text-align: right;
+  direction: rtl;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-size: 20px;
+  justify-content: flex-start;
+  border-left: 1px solid #087f5b;
+  border-right: 1px solid #087f5b;
+  overflow-wrap: unset;
+  text-wrap: unset;  
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  word-break:unset;
+  /* word-break: 'break-all'; */
+   /* min-width: 100px; */   /* Prevent columns shrink or expand width*/
+  /* align-items: center; */
+}
+
 /* עיצוב פריט בודד בתוך הגריד */
 .row-item {
-  background-color: white;
+  display: flex;
+  flex-direction: row;
+  background-color: rgba(226, 225, 230, 0.9);
   /* border: 1px solid #212020; */
   border-radius: 4px;
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
   padding-bottom: 2px;
-  margin-bottom: 0px;        /* Space between Rows */
-  /* padding-bottom: 10px; */
-  /* margin-bottom: 5px; */        /* Space between Rows */
+  margin-bottom: 1px;        /* Space between Rows */
   text-align: right;
   direction: rtl;
-  display: flex;
-  flex-direction: row;
-  /* border-bottom: 1px solid #212020; */
   border-top: 1px solid #212020;
+  /* min-width: 3000px; */
+
+  /* border-bottom: 1px solid #212020; */
   /* align-items: center; */
   /* border-collapse: collapse; */
   /* border-spacing: 20px 20px; */
@@ -90,22 +136,3 @@ body {
   background-color: #ffa94d;
 }
 
-.gridCol{
-  text-align: right;
-  direction: rtl;
-  /* align-items: center; */
-  padding-left: 7px;
-  padding-right: 7px;
-  padding-top: 7px;
-  padding-bottom: 7px;
-  font-size: 20px;
-  display: flex;
-  justify-content:flex-start;
-  overflow-wrap: 'break-word';
-  /* word-break: 'break-all'; */
-  /* white-space: 'pre-wrap'; */
-  text-wrap: 'pretty';  
-  /* balance */
-  border-left: 1px solid #087f5b;
-  border-right: 1px solid #087f5b;
-}

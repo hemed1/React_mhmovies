@@ -30,7 +30,7 @@ var result = null;
 
 
 export var DataBasesConfigList = FirebaseConfig.dataBasesConfigList;
-export var dataBaseIndex = 1; 
+export var dataBaseIndex = 0;   //await getDatabaseIndex("launch.json");
 var firebaseConfig = {};
 var app;
 var database;            //changeDatabase(dataBaseIndex);
@@ -42,28 +42,28 @@ await Init();
 
 export async function Init() 
 {
+  // Get URL parameters like ?=dbIndex = 1
   const queryParameters = new URLSearchParams(window.location.search)
   const dbIndex = queryParameters.get("dbIndex")
-  //const name = queryParameters.get("name")
-
-  // יצירת אובייקט לקריאת הפרמטרים מה-URL
-  //const [searchParams] = useSearchParams();
-  // שליפת הערך של הפרמטר 'user'
-  //const dbIndex = searchParams.get('dbIndex');
-
-
-  const tmpDataBaseIndex = await getDatabaseIndexFromFile("launch.json");
-  //console.log('Firebase Init - getDatabaseIndexFromFile: ',tmpDataBaseIndex);
 
   if (dbIndex)
   {
     dataBaseIndex = Number(dbIndex);
+  }
+  else
+  {
+    const tmpDataBaseIndex = await getDatabaseIndexFromFile("launch.json");
+    if (tmpDataBaseIndex)
+    {
+      dataBaseIndex = tmpDataBaseIndex;
+    }
   }
 
   database = await changeDatabase(dataBaseIndex);
 
   return database;
 }
+
 
 
 /// Async Firebase's real-time lisener (onValue)
@@ -368,7 +368,7 @@ export async function GetQuerySync( tableName, fieldName, fieldValue )
 
 export async function InsertRecord( tableName, values )
 {
-    if (values["LastUpdateDate"] !== null && tableName==='TBL_Movies')
+    if (values["LastUpdateDate"] !== null)
     {
       values.LastUpdateDate =  dateSetFormat(new Date());
     }
@@ -381,7 +381,7 @@ export async function InsertRecord( tableName, values )
             {
               console.log("Record inserted successfully:  " + snapshot.key);
               result = snapshot.key;
-              if (values["FirebaseID"] !== null && tableName==='TBL_Movies')
+              if (values["FirebaseID"] !== null)
               {
                   values["FirebaseID"] = snapshot.key;
               }
@@ -452,6 +452,52 @@ export async function UpdateRecord( tableName, recordKey, values )
 
   
     return result;
+}
+
+/// Update Specific fields to save (not All)
+export async function UpdateField(tableName, recordKey, values) 
+{
+  var result = false;
+
+  // 1. Create a reference to the specific 'table' (node) in your database
+  const tableRef = ref(database, `${tableName}/${recordKey}`);
+
+  await update(tableRef, values)
+          .then((snapshot) => 
+          {
+            console.log("Field updated successfully!");
+            result = true;
+          })
+          .catch(
+            (error) => console.error("Error updating Field:", error)
+          );
+
+  // };
+
+
+  // const UserProfile = ({ recordKey }) => {
+  //   const [recordData, setUserData] = useState(null);
+
+  //   useEffect(() => {
+  //     const userRef = ref(database, `${tableName}/${recordKey}`);
+
+  //     // Subscribe to changes
+  //     const unsubscribe = onValue(userRef, (snapshot) => {
+  //                           const data = snapshot.val();
+  //                           setUserData(data);
+  //                         });
+
+  //     // Cleanup subscription on unmount
+  //     return () => unsubscribe();
+  //   }, [recordKey]);
+
+  //   if (!recordData) 
+  //     return <p>Loading...</p>;
+
+  //   return <div>{recordData.name}'s Profile</div>;
+  // };
+  
+  return result;
 }
 
 export async function DeleteRecord( tableName, recordKey, fieldName = "FirebaseID")
@@ -562,52 +608,6 @@ export async function DeleteAllRecords( tableName )
   return false;
 }
 
-
-/// Update Specific fields to save (not All)
-export async function UpdateField(tableName, recordKey, values) 
-{
-  var result = false;
-
-  // 1. Create a reference to the specific 'table' (node) in your database
-  const tableRef = ref(database, `${tableName}/${recordKey}`);
-
-
-  await update(tableRef, values)
-          .then((snapshot) => 
-          {
-            console.log("Field updated successfully!");
-            result = true;
-          })
-          .catch((error) => console.error("Error updating Field:", error));
-
-  // };
-
-
-  // const UserProfile = ({ recordKey }) => {
-  //   const [recordData, setUserData] = useState(null);
-
-  //   useEffect(() => {
-  //     const userRef = ref(database, `${tableName}/${recordKey}`);
-
-  //     // Subscribe to changes
-  //     const unsubscribe = onValue(userRef, (snapshot) => {
-  //                           const data = snapshot.val();
-  //                           setUserData(data);
-  //                         });
-
-  //     // Cleanup subscription on unmount
-  //     return () => unsubscribe();
-  //   }, [recordKey]);
-
-  //   if (!recordData) 
-  //     return <p>Loading...</p>;
-
-  //   return <div>{recordData.name}'s Profile</div>;
-  // };
-  
-  return result;
-}
-
 export async function dispose()
 {
 
@@ -642,18 +642,24 @@ export async function dispose()
 /// Fetch the JSON file directly using standard JavaScript fetch
 async function getDatabaseIndexFromFile( fileName ) 
 {
+  var result = null;
   const response = await fetch("/" + fileName);
 
   if (!response.ok) 
   {
-    throw new Error(`Failed to load launch.json: ${response.statusText}`);
+    return null;
+    //throw new Error(`Failed to load launch.json: ${response.statusText}`);
   }
 
   const obj = await response.json();
-  const dbIndex = Number(obj.DatabaselistIndex); 
-  
-  return dbIndex;
+  if (obj['DatabaselistIndex'] != null)
+  {
+    result = Number(obj.DatabaselistIndex); 
+  }
+
+  return result;
 }
+
 
 /// Change Databse
 export async function changeDatabase(dbIndex)
@@ -677,6 +683,52 @@ export async function changeDatabase(dbIndex)
     return database;
 }
 
+export async function changeIDs(mainTableName)
+{
+  
+  const data   = [...await GetTableDataSync(mainTableName)].sort((a, b) => a.NoteID - b.NoteID);
+  const childs = [...await GetTableDataSync('TBL_NotesChilds')].sort((a, b) => a.NoteID - b.NoteID);
+  const images = [...await GetTableDataSync('TBL_NotesImages')].sort((a, b) => a.NoteID - b.NoteID);
+
+  var index = 0
+  var id = data[0].NoteID
+
+  while (index < data.length)
+  {
+      index++;
+      if (index >= data.length)
+      {
+        break;
+      }
+
+      const compareNoteID = data[index].NoteID;
+      if (compareNoteID !== id+1)
+      {
+          id++;
+          const newNoteID = id;
+          var subChilds = [...childs].filter((item) => item.NoteID === compareNoteID);
+          subChilds.map( async (item)  => 
+          {
+              await UpdateField('TBL_NotesChilds', item.FirebaseID, {NoteID: newNoteID})
+          })
+
+          var newImages = [...images].filter((item) => item.NoteID === compareNoteID);
+          newImages.map( async (item)  => 
+          {
+              await UpdateField('TBL_NotesImages', item.FirebaseID, {NoteID: newNoteID})
+          })
+          
+          await UpdateField(mainTableName, data[index].FirebaseID, {NoteID: newNoteID});
+          //data[index].NoteID = noteID+1;
+          //index++;
+      }
+      else
+      {
+          id++;
+      }
+  }
+
+}
 
 // export function MyComponent(tableName) 
 // {
